@@ -1,0 +1,66 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: Battivus-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: strapi
+      POSTGRES_PASSWORD: strapi_password
+      POSTGRES_DB: strapi
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - Battivus-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U strapi -d strapi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Strapi CMS
+  strapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: Battivus-strapi
+    restart: unless-stopped
+    environment:
+      # Database
+      DATABASE_CLIENT: postgres
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_NAME: strapi
+      DATABASE_USERNAME: strapi
+      DATABASE_PASSWORD: strapi_password
+      DATABASE_SSL: "false"
+      # Strapi
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: 1337
+      APP_KEYS: Battivus-app-key-1,Battivus-app-key-2,Battivus-app-key-3,Battivus-app-key-4
+      API_TOKEN_SALT: Battivus-api-token-salt-2024
+      ADMIN_JWT_SECRET: Battivus-admin-jwt-secret-2024
+      TRANSFER_TOKEN_SALT: Battivus-transfer-token-salt-2024
+      JWT_SECRET: Battivus-jwt-secret-2024
+    volumes:
+      - ./config:/opt/app/config
+      - ./src:/opt/app/src
+      - ./public/uploads:/opt/app/public/uploads
+      - ./.env:/opt/app/.env
+    ports:
+      - "1337:1337"
+    networks:
+      - Battivus-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+
+networks:
+  Battivus-network:
+    driver: bridge

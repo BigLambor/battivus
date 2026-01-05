@@ -1,0 +1,34 @@
+{
+  "name": "Battivus-cms",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Battivus CMS - Strapi headless CMS for drone battery website",
+  "scripts": {
+    "copy-schemas": "node scripts/copy-schemas.js",
+    "develop": "strapi develop",
+    "develop:watch": "node scripts/dev-with-schemas.js",
+    "start": "strapi start",
+    "build": "strapi build && npm run copy-schemas",
+    "strapi": "strapi"
+  },
+  "dependencies": {
+    "@strapi/strapi": "^5.5.1",
+    "@strapi/plugin-users-permissions": "^5.5.1",
+    "@strapi/plugin-cloud": "^5.5.1",
+    "pg": "^8.13.1",
+    "better-sqlite3": "^11.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.28.0",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.3",
+    "esbuild": "^0.24.2"
+  },
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}

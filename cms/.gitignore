@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Build
+build/
+dist/
+.cache/
+
+# Environment
+.env.local
+.env.*.local
+
+# Uploads (keep structure, ignore files)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Strapi
+.strapi/
+exports/
