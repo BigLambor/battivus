@@ -5,8 +5,22 @@
  * In production: connects to Strapi Cloud
  */
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+export const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || '';
+
+export function getStrapiMedia(url: string | null) {
+  if (url == null) {
+    return null;
+  }
+
+  // Return the full URL if the media is already a full URL
+  if (url.startsWith('http') || url.startsWith('//')) {
+    return url;
+  }
+
+  // Otherwise prepend the Strapi URL
+  return `${STRAPI_URL}${url}`;
+}
 
 interface StrapiResponse<T> {
   data: T[];
@@ -358,6 +372,7 @@ export interface BlogPost {
   content: string;
   excerpt: string;
   featuredImage?: { url: string };
+  featured_image?: { url: string };
   author: { name: string; avatar?: string };
   tags: { name: string; slug: string }[];
   publishedAt: string;

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getBlogPosts } from '@/lib/strapi';
+import { getBlogPosts, getStrapiMedia } from '@/lib/strapi';
 
 export const metadata: Metadata = {
   title: 'Blog | Battivus Drone Battery Insights',
@@ -34,29 +34,32 @@ export default async function BlogPage() {
                 >
                   {/* Featured Image */}
                   <div className="aspect-video bg-gray-200 relative overflow-hidden">
-                    {post.featuredImage?.url ? (
-                      <img
-                        src={post.featuredImage.url}
-                        alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
-                        <svg
-                          className="w-16 h-16 text-blue-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
-                          />
-                        </svg>
-                      </div>
-                    )}
+                    {(() => {
+                      const imageUrl = getStrapiMedia(post.featured_image?.url || post.featuredImage?.url || null);
+                      return imageUrl ? (
+                        <img
+                          src={imageUrl}
+                          alt={post.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-blue-200">
+                          <svg
+                            className="w-16 h-16 text-blue-400"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={1.5}
+                              d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                            />
+                          </svg>
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Content */}
@@ -154,11 +157,10 @@ export default async function BlogPage() {
                 <Link
                   key={i}
                   href={`/blog?page=${i + 1}`}
-                  className={`px-4 py-2 rounded-lg ${
-                    meta.pagination.page === i + 1
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  } transition`}
+                  className={`px-4 py-2 rounded-lg ${meta.pagination.page === i + 1
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    } transition`}
                 >
                   {i + 1}
                 </Link>

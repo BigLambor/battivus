@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getBlogPostBySlug, getBlogPosts, BlogPost } from '@/lib/strapi';
+import { getBlogPostBySlug, getBlogPosts, BlogPost, getStrapiMedia, STRAPI_URL } from '@/lib/strapi';
 import { siteConfig } from '@/lib/config';
 
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+// const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
 // Fetch blog post from Strapi
 async function fetchBlogPost(slug: string): Promise<BlogPost | null> {
@@ -66,7 +66,9 @@ export async function generateMetadata({
         openGraph: {
             title,
             description,
-            images: post.featuredImage?.url ? [{ url: post.featuredImage.url }] : [],
+            images: (post.featured_image?.url || post.featuredImage?.url)
+                ? [{ url: getStrapiMedia(post.featured_image?.url || post.featuredImage?.url) || '' }]
+                : [],
             type: 'article',
             publishedTime: post.publishedAt,
         },
@@ -167,31 +169,34 @@ export default async function BlogPostPage({
                         </div>
 
                         {/* Featured Image */}
-                        {post.featuredImage?.url ? (
-                            <div className="aspect-video bg-gray-200 rounded-2xl overflow-hidden mb-12">
-                                <img
-                                    src={post.featuredImage.url}
-                                    alt={post.title}
-                                    className="w-full h-full object-cover"
-                                />
-                            </div>
-                        ) : (
-                            <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl overflow-hidden mb-12 flex items-center justify-center">
-                                <svg
-                                    className="w-24 h-24 text-blue-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth={1.5}
-                                        d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                        {(() => {
+                            const imageUrl = getStrapiMedia(post.featured_image?.url || post.featuredImage?.url || null);
+                            return imageUrl ? (
+                                <div className="aspect-video bg-gray-200 rounded-2xl overflow-hidden mb-12">
+                                    <img
+                                        src={imageUrl}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover"
                                     />
-                                </svg>
-                            </div>
-                        )}
+                                </div>
+                            ) : (
+                                <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl overflow-hidden mb-12 flex items-center justify-center">
+                                    <svg
+                                        className="w-24 h-24 text-blue-400"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={1.5}
+                                            d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                                        />
+                                    </svg>
+                                </div>
+                            );
+                        })()}
 
                         {/* Content */}
                         <div

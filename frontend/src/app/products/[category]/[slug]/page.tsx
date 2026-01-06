@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { siteConfig, productCategories } from '@/lib/config';
+import { getStrapiMedia } from '@/lib/strapi';
 import {
   generateProductSchema,
   generateFAQSchema,
@@ -11,6 +12,7 @@ import {
 import type { Product } from '@/types';
 import InquiryButton from '@/components/forms/InquiryButton';
 import ProductFAQ from '@/components/products/ProductFAQ';
+import ProductGallery from '@/components/products/ProductGallery';
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
@@ -18,7 +20,7 @@ const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'
 async function fetchProductFromStrapi(category: string, slug: string): Promise<Product | null> {
   try {
     const response = await fetch(
-      `${STRAPI_URL}/api/products?filters[slug][$eq]=${slug}&populate=category`,
+      `${STRAPI_URL}/api/products?filters[slug][$eq]=${slug}&populate=*`,
       { next: { revalidate: 60 } }
     );
 
@@ -52,7 +54,7 @@ async function fetchProductFromStrapi(category: string, slug: string): Promise<P
         connectorType: strapiProduct.connector_type || 'N/A',
         cellType: strapiProduct.cell_type || 'LiPo',
       },
-      images: strapiProduct.images?.map((img: { url: string }) => img.url) || [],
+      images: strapiProduct.images?.map((img: { url: string }) => getStrapiMedia(img.url) || '').filter(Boolean) || [],
       featured: strapiProduct.featured || false,
       faqs: strapiProduct.faqs || [],
       seo: {
@@ -224,7 +226,7 @@ export default async function ProductDetailPage({
   const breadcrumbSchema = generateBreadcrumbSchema([
     { name: 'Home', url: '/' },
     { name: 'Products', url: '/products' },
-    { name: product.category.name, url: `/products/${product.category.slug}` },
+    { name: product.category.name, url: `/products?category=${product.category.slug}` },
     { name: product.name, url: `/products/${product.category.slug}/${product.slug}` },
   ]);
 
@@ -264,7 +266,7 @@ export default async function ProductDetailPage({
             <li className="text-gray-400">/</li>
             <li>
               <Link
-                href={`/products/${product.category.slug}`}
+                href={`/products?category=${product.category.slug}`}
                 className="text-gray-500 hover:text-blue-600"
               >
                 {product.category.name}
@@ -283,31 +285,12 @@ export default async function ProductDetailPage({
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
+            {/* Product Images */}
             <div>
-              <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center mb-4">
-                <svg
-                  className="w-32 h-32 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={1.5}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </div>
-              {/* Thumbnail gallery placeholder */}
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="aspect-square bg-gray-100 rounded-lg cursor-pointer hover:ring-2 hover:ring-blue-500"
-                  />
-                ))}
-              </div>
+              <ProductGallery
+                images={product.images}
+                productName={product.name}
+              />
             </div>
 
             {/* Product Info */}

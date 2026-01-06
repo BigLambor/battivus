@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { filterOptions, productCategories } from '@/lib/config';
+import { getStrapiMedia } from '@/lib/strapi';
 import type { ProductFilters } from '@/types';
 
 // Product type matching Strapi API response
@@ -22,6 +23,7 @@ interface StrapiProduct {
   connector_type: string;
   cell_type: 'LiPo' | 'Li-ion' | 'LiFePO4';
   featured: boolean;
+  images?: { url: string }[];
   category?: {
     id: number;
     name: string;
@@ -221,10 +223,21 @@ function ProductCard({ product }: ProductCardProps) {
       href={`/products/${categorySlug}/${product.slug}`}
       className="group bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
-      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-        <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-        </svg>
+      <div className="aspect-video bg-white flex items-center justify-center relative border-b border-gray-100">
+        {(() => {
+          const imageUrl = product.images?.[0]?.url ? getStrapiMedia(product.images[0].url) : null;
+          return imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={product.name}
+              className="w-full h-full object-contain p-4"
+            />
+          ) : (
+            <svg className="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          );
+        })()}
         {product.featured && (
           <span className="absolute top-3 left-3 bg-blue-600 text-white text-xs px-2 py-1 rounded">
             Featured
@@ -306,7 +319,7 @@ export default function ProductsPage() {
         const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
 
         // Fetch products with category populated
-        const productsRes = await fetch(`${strapiUrl}/api/products?populate=category`);
+        const productsRes = await fetch(`${strapiUrl}/api/products?populate=*`);
         if (!productsRes.ok) throw new Error('Failed to fetch products');
         const productsData = await productsRes.json();
         setProducts(productsData.data || []);
