@@ -1,7 +1,27 @@
 import Link from 'next/link';
-import { siteConfig, productCategories, certifications } from '@/lib/config';
+import { siteConfig, productCategories as configCategories, certifications } from '@/lib/config';
+import { getCategories, getStrapiMedia } from '@/lib/strapi';
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch categories from Strapi
+  let categories = [];
+  try {
+    categories = await getCategories();
+  } catch (error) {
+    console.error('Failed to fetch categories:', error);
+  }
+
+  // Fallback to config if no categories found
+  if (!categories || categories.length === 0) {
+    categories = configCategories.map(c => ({
+      id: c.id,
+      name: c.name,
+      slug: c.slug,
+      description: c.description,
+      image: null
+    }));
+  }
+
   return (
     <>
       {/* Hero Section */}
@@ -66,33 +86,45 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {productCategories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/products?category=${category.slug}`}
-                className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
-              >
-                <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center">
-                  <svg className="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition">
-                    {category.name}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {category.description}
-                  </p>
-                  <div className="mt-4 text-blue-600 font-medium flex items-center">
-                    View Products
-                    <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+            {categories.map((category) => {
+              const imageUrl = getStrapiMedia(category.image?.url);
+
+              return (
+                <Link
+                  key={category.id}
+                  href={`/products?category=${category.slug}`}
+                  className="group bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+                >
+                  <div className="aspect-video bg-gradient-to-br from-blue-100 to-blue-200 flex items-center justify-center overflow-hidden">
+                    {imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={category.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <svg className="w-16 h-16 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                    )}
                   </div>
-                </div>
-              </Link>
-            ))}
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-blue-600 transition">
+                      {category.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm line-clamp-2">
+                      {category.description}
+                    </p>
+                    <div className="mt-4 text-blue-600 font-medium flex items-center">
+                      View Products
+                      <svg className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -102,7 +134,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Why Choose BattiVue
+              Why Choose BattiVus
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               We combine cutting-edge technology with years of expertise to deliver the best drone batteries
