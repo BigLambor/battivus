@@ -67,7 +67,7 @@ export async function generateMetadata({
             title,
             description,
             images: (post.featured_image?.url || post.featuredImage?.url)
-                ? [{ url: getStrapiMedia(post.featured_image?.url || post.featuredImage?.url) || '' }]
+                ? [{ url: getStrapiMedia(post.featured_image?.url || post.featuredImage?.url || null) || '' }]
                 : [],
             type: 'article',
             publishedTime: post.publishedAt,

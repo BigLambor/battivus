@@ -97,9 +97,10 @@ If you prefer the official managed service:
 2.  Click **"Create Project"**.
 3.  Connect your GitHub repository `Battivus`.
 4.  Strapi Cloud will automatically detect the app configuration.
-    - **Note**: Ensure you point it to the `cms` directory if asked for root.
+    - **Base Directory**: Enter `cms` (This is critical because your code is in the `cms` folder).
 5.  **Deployment**: It handles the database, CDN, and email automatically.
 6.  **Done**: You will get a URL like `https://battivus.strapi.app`.
+    > **Note on Database**: Strapi Cloud **automatically provisions** a PostgreSQL database for you and injects the connection details. You **do not** need to manually configure the database or worry that your local `database.ts` points to a local DB. Strapi will automatically sync your content types (schema) from your code to the cloud database upon deployment.
 
 *(If you choose Strapi Cloud, skip the "Media Storage" section below as it's included, unless you specifically want Cloudinary).*
 
@@ -187,6 +188,35 @@ To prevent losing images when the backend container restarts, use Cloudinary.
 - [ ] Ensure `NODE_ENV` is `production`.
 - [ ] Ensure all "Secrets" are generated using a strong generator (e.g. `openssl rand -base64 32`).
 - [ ] In Strapi, go to **Settings -> Roles -> Public** and ensure strictly necessary permissions are enabled (e.g., `find` and `findOne` for Products/Blogs), **DISABLE** `delete`/`update` for Public.
+
+---
+
+## 📦 6. Data Migration (Optional)
+
+**Local data does NOT automatically sync to production.** If you want to move your local content (Products, Articles, etc.) to the live server, use the **Strapi Transfer** feature.
+
+### Step 6.1: Create Transfer Token (Production)
+1.  Log in to your **Production Strapi Admin** (e.g., `https://battivus.strapi.app/admin`).
+2.  Go to **Settings** -> **Transfer Tokens**.
+3.  Click **"Add new transfer token"**.
+4.  Name: `Local-to-Prod Transfer`.
+5.  Permissions: **Full Access** (Push & Pull).
+6.  **Save & Copy the Token** (You won't see it again).
+
+### Step 6.2: Run Transfer Command (Local)
+In your local terminal, inside the `cms` folder:
+
+```bash
+# General Syntax
+npm run strapi transfer -- --to <your-production-url>
+
+# Example
+npm run strapi transfer -- --to https://battivus.strapi.app
+```
+
+1.  It will ask for your **Transfer Token** (paste the one from Step 6.1).
+2.  It will ask to confirm erasing the remote database (for the initial sync, this is fine).
+3.  Wait for the transfer to complete. Your local images and data are now live!
 
 ---
 **Deployment Ready!** 🚀
