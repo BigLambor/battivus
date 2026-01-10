@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { siteConfig, productCategories as configCategories, certifications } from '@/lib/config';
-import { getCategories, getStrapiMedia } from '@/lib/strapi';
+import { getCategories, getStrapiMedia, Category } from '@/lib/strapi';
 
 export default async function HomePage() {
   // Fetch categories from Strapi
-  let categories = [];
+  let categories: Category[] = [];
   try {
     categories = await getCategories();
   } catch (error) {
@@ -14,12 +14,15 @@ export default async function HomePage() {
   // Fallback to config if no categories found
   if (!categories || categories.length === 0) {
     categories = configCategories.map(c => ({
-      id: c.id,
+      id: parseInt(c.id), // Ensure ID is number if config has string
+      documentId: c.id,   // Mock documentId
       name: c.name,
       slug: c.slug,
       description: c.description,
-      image: null
-    }));
+      image: undefined, // undefined is better than null for optional
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    } as unknown as Category));
   }
 
   return (
@@ -87,7 +90,7 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {categories.map((category) => {
-              const imageUrl = getStrapiMedia(category.image?.url);
+              const imageUrl = getStrapiMedia(category.image?.url || null);
 
               return (
                 <Link
