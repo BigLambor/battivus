@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { certifications } from '@/lib/config';
 
 export const metadata: Metadata = {
@@ -27,7 +28,7 @@ export default function TechnologyPage() {
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">R&D Innovation</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Our dedicated R&D team constantly pushes the boundaries of battery technology, 
+                Our dedicated R&D team constantly pushes the boundaries of battery technology,
                 developing next-generation solutions for evolving UAV requirements.
               </p>
               <ul className="space-y-4">
@@ -47,10 +48,13 @@ export default function TechnologyPage() {
                 ))}
               </ul>
             </div>
-            <div className="bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl aspect-video flex items-center justify-center">
-              <svg className="w-24 h-24 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
+            <div className="relative rounded-2xl overflow-hidden aspect-video shadow-lg">
+              <Image
+                src="/images/tech-rnd.jpg"
+                alt="Battery R&D Innovation"
+                fill
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
@@ -65,7 +69,7 @@ export default function TechnologyPage() {
               State-of-the-art production facilities ensuring consistent quality and reliability
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
@@ -103,18 +107,21 @@ export default function TechnologyPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div className="order-2 lg:order-1 bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl aspect-video flex items-center justify-center">
-              <svg className="w-24 h-24 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
+            <div className="order-2 lg:order-1 relative rounded-2xl overflow-hidden aspect-video shadow-lg">
+              <Image
+                src="/images/tech-testing.jpg"
+                alt="Rigorous Battery Testing"
+                fill
+                className="object-cover"
+              />
             </div>
             <div className="order-1 lg:order-2">
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Rigorous Testing</h2>
               <p className="text-lg text-gray-600 mb-6">
-                Every battery undergoes comprehensive testing to ensure safety, reliability, 
+                Every battery undergoes comprehensive testing to ensure safety, reliability,
                 and performance under real-world conditions.
               </p>
-              
+
               <div className="space-y-4">
                 {[
                   { name: 'Capacity Testing', desc: 'Verify rated capacity under standard conditions' },
@@ -148,7 +155,7 @@ export default function TechnologyPage() {
               Our batteries meet international safety and quality standards
             </p>
           </div>
-          
+
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {certifications.map((cert) => (
               <div key={cert.id} className="bg-gray-800 p-6 rounded-xl text-center">
@@ -160,7 +167,7 @@ export default function TechnologyPage() {
               </div>
             ))}
           </div>
-          
+
           <div className="mt-12 text-center">
             <p className="text-gray-400 mb-4">
               All our batteries are compliant with international shipping regulations
@@ -183,7 +190,7 @@ export default function TechnologyPage() {
               Scalable manufacturing to meet your volume requirements
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center p-6">
               <div className="text-5xl font-bold text-blue-600 mb-2">100K+</div>
