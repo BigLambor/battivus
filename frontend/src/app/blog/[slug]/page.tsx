@@ -30,14 +30,17 @@ async function fetchBlogPost(slug: string): Promise<BlogPost | null> {
 }
 
 // Generate static params for all blog posts
+// Generate static params for all blog posts
 export async function generateStaticParams() {
     try {
-        const { data: posts } = await getBlogPosts({ pageSize: 100 });
-        return (posts || []).map((post) => ({
+        const result = await getBlogPosts({ pageSize: 100 });
+        const posts = result?.data || [];
+        return posts.map((post) => ({
             slug: post.slug,
         }));
     } catch (error) {
-        console.error('Error generating static params for blog:', error);
+        // Return empty params if Strapi is not available during build
+        console.warn('Could not generate static params for blog:', error);
         return [];
     }
 }
