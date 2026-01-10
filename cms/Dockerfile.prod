@@ -1,0 +1,37 @@
+# Production Dockerfile for Strapi
+
+# Stage 1: Build
+FROM node:20-alpine as build
+RUN apk update && apk add --no-cache build-base gcc autoconf automake zlib-dev libpng-dev vips-dev git > /dev/null 2>&1
+ENV NODE_ENV=production
+
+WORKDIR /opt/app
+COPY package*.json ./
+RUN npm ci --include=dev
+COPY . .
+RUN npm run build
+RUN npm run copy-schemas
+
+# Stage 2: Database Migration (Optional - usually better to run via command)
+# Keeping it clean.
+
+# Stage 3: Runtime
+FROM node:20-alpine
+RUN apk add --no-cache vips-dev
+ENV NODE_ENV=production
+
+WORKDIR /opt/app
+COPY --from=build /opt/app/node_modules ./node_modules
+COPY --from=build /opt/app/dist ./dist
+COPY --from=build /opt/app/public ./public
+COPY --from=build /opt/app/package*.json ./
+COPY --from=build /opt/app/favicon.ico ./favicon.ico
+
+# Copy other necessary files
+COPY --from=build /opt/app/src ./src 
+# Note: Strapi sometimes needs src even in prod depending on plugin usage, but usually dist is enough. 
+# However, keeping src ensures dynamic zones/components are schema-aware if needed by runtime tailored scripts.
+# For standard V4, `dist` is primary. 
+
+EXPOSE 1337
+CMD ["npm", "run", "start"]

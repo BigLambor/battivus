@@ -73,11 +73,19 @@ start_cms() {
     if check_port $CMS_PORT; then
         echo -e "${YELLOW}CMS is already running on port $CMS_PORT.${NC}"
     else
-        echo -e "${GREEN}� Starting Strapi CMS...${NC}"
+        echo -e "${GREEN}🐳 Starting Strapi CMS (Docker)...${NC}"
         cd $CMS_DIR
-        npm run develop &
+        docker compose up -d
         cd ..
     fi
+}
+
+stop_cms() {
+    echo -e "${YELLOW}Stopping Strapi CMS (Docker)...${NC}"
+    cd $CMS_DIR
+    docker compose down
+    cd ..
+    echo -e "${RED}Stopped Strapi CMS.${NC}"
 }
 
 start_frontend() {
@@ -135,11 +143,8 @@ case "$COMMAND" in
         esac
         
         # Keep script running if we started something in background so we can see logs
-        # But if we just triggered background processes, we might want to tail logs or just exit?
-        # The previous script waited. Enhanced script usually exits unless in 'all' mode where it acts as a monitor?
-        # Let's simple wait indefinitely only if 'start' was called, so Ctrl+C works to kill the script but not necessarily the background procs unless trapped.
-        # Actually, for a control script, 'start & exit' is often preferred, OR 'start & tail'. 
-        # Let's keep it simple: Start and say goodbye. The user can 'stop' later.
+        # With Docker in background (-d), we don't need to keep script alive for it, 
+        # but npm run dev is BG.
         
         echo -e "\n${BOLD}Services initiated.${NC}"
         echo -e "Run '${BLUE}$0 status${NC}' to check status."
@@ -149,11 +154,11 @@ case "$COMMAND" in
     stop)
         case "$TARGET" in
             all)
-                kill_port $CMS_PORT "Strapi CMS"
+                stop_cms
                 kill_port $FRONTEND_PORT "Frontend"
                 ;;
             cms)
-                kill_port $CMS_PORT "Strapi CMS"
+                stop_cms
                 ;;
             frontend|fe)
                 kill_port $FRONTEND_PORT "Frontend"
