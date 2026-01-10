@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { getBlogPosts, getStrapiMedia } from '@/lib/strapi';
+import { getBlogPosts, getStrapiMedia, BlogPost } from '@/lib/strapi';
 
 export const metadata: Metadata = {
   title: 'Blog | Battivus Drone Battery Insights',
@@ -8,7 +8,18 @@ export const metadata: Metadata = {
 };
 
 export default async function BlogPage() {
-  const { data: posts, meta } = await getBlogPosts({ pageSize: 12 });
+  let posts: BlogPost[] = [];
+  let meta: any = null;
+
+  try {
+    const response = await getBlogPosts({ pageSize: 12 });
+    posts = response.data;
+    meta = response.meta;
+  } catch (error) {
+    console.warn('Failed to fetch blog posts during build:', error);
+    // Fallback to empty state
+    posts = [];
+  }
 
   return (
     <>
