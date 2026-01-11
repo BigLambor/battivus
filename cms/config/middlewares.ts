@@ -1,4 +1,4 @@
-export default [
+export default ({ env }: { env: any }) => [
   'strapi::logger',
   'strapi::errors',
   {
@@ -19,11 +19,11 @@ export default [
     name: 'strapi::cors',
     config: {
       headers: '*',
-      origin: [
+      origin: env.array('CORS_ORIGINS', [
         'http://localhost:3000',
         'https://battivus-7mu3tucvw-dobigdata51s-projects.vercel.app',
-        // Add your custom domain here if needed
-      ],
+        '*.vercel.app',
+      ]),
     },
   },
   'strapi::poweredBy',

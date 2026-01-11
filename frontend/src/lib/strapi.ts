@@ -5,8 +5,8 @@
  * In production: connects to Strapi Cloud
  */
 
-export const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || '';
+export const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:1337';
+const STRAPI_TOKEN = process.env.STRAPI_API_TOKEN || process.env.API_TOKEN || '';
 
 export function getStrapiMedia(url: string | null) {
   if (url == null) {
