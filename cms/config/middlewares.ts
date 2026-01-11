@@ -19,11 +19,7 @@ export default ({ env }: { env: any }) => [
     name: 'strapi::cors',
     config: {
       headers: '*',
-      origin: env.array('CORS_ORIGINS', [
-        'http://localhost:3000',
-        'https://battivus-7mu3tucvw-dobigdata51s-projects.vercel.app',
-        '*.vercel.app',
-      ]),
+      origin: '*', // Allow all origins to fix CORS issues on Vercel preview URLs
     },
   },
   'strapi::poweredBy',
