@@ -8,8 +8,8 @@ export default [
         useDefaults: true,
         directives: {
           'connect-src': ["'self'", 'https:'],
-          'img-src': ["'self'", 'data:', 'blob:', 'market-assets.strapi.io'],
-          'media-src': ["'self'", 'data:', 'blob:'],
+          'img-src': ["'self'", 'data:', 'blob:', 'market-assets.strapi.io', 'res.cloudinary.com'],
+          'media-src': ["'self'", 'data:', 'blob:', 'res.cloudinary.com'],
           upgradeInsecureRequests: null,
         },
       },
@@ -19,7 +19,11 @@ export default [
     name: 'strapi::cors',
     config: {
       headers: '*',
-      origin: ['http://localhost:3030', 'http://localhost:3000', 'http://127.0.0.1:3030'],
+      origin: [
+        'http://localhost:3000',
+        'https://battivus-7mu3tucvw-dobigdata51s-projects.vercel.app',
+        // Add your custom domain here if needed
+      ],
     },
   },
   'strapi::poweredBy',
