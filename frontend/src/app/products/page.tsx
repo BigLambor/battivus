@@ -314,34 +314,43 @@ function ProductsContent() {
   // Fetch products and categories from Strapi
   useEffect(() => {
     async function fetchData() {
+      const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+      setLoading(true);
+      setError(null);
+
       try {
-        setLoading(true);
-        const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+        // 1. Fetch Products
+        try {
+          const productsRes = await fetch(`${strapiUrl}/api/products?populate=*`);
+          if (!productsRes.ok) throw new Error(`Products status: ${productsRes.status}`);
+          const productsData = await productsRes.json();
+          setProducts(productsData.data || []);
+        } catch (prodErr) {
+          console.error('Error fetching products:', prodErr);
+          throw new Error('Failed to load products'); // Re-throw to trigger main error state
+        }
 
-        // Fetch products with category populated
-        const productsRes = await fetch(`${strapiUrl}/api/products?populate=*`);
-        if (!productsRes.ok) throw new Error('Failed to fetch products');
-        const productsData = await productsRes.json();
-        setProducts(productsData.data || []);
+        // 2. Fetch Categories (fail silently/gracefully)
+        try {
+          const categoriesRes = await fetch(`${strapiUrl}/api/categories`);
+          if (!categoriesRes.ok) throw new Error(`Categories status: ${categoriesRes.status}`);
+          const categoriesData = await categoriesRes.json();
+          setCategories(
+            (categoriesData.data || []).map((c: StrapiCategory) => ({
+              id: String(c.id),
+              name: c.name,
+              slug: c.slug,
+            }))
+          );
+        } catch (catErr) {
+          console.warn('Error fetching categories, using fallback:', catErr);
+          // Fallback to config categories
+          setCategories(productCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug })));
+        }
 
-        // Fetch categories
-        const categoriesRes = await fetch(`${strapiUrl}/api/categories`);
-        if (!categoriesRes.ok) throw new Error('Failed to fetch categories');
-        const categoriesData = await categoriesRes.json();
-        setCategories(
-          (categoriesData.data || []).map((c: StrapiCategory) => ({
-            id: String(c.id),
-            name: c.name,
-            slug: c.slug,
-          }))
-        );
-
-        setError(null);
       } catch (err) {
-        console.error('Error fetching from Strapi:', err);
+        console.error('Critical error fetching data:', err);
         setError('Failed to load products. Using fallback data.');
-        // Fallback to config categories
-        setCategories(productCategories.map((c) => ({ id: c.id, name: c.name, slug: c.slug })));
       } finally {
         setLoading(false);
       }
